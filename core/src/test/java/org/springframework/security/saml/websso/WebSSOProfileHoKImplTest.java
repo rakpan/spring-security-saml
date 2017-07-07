@@ -35,6 +35,7 @@ import org.springframework.security.saml.storage.StorageFactoryTestImpl;
 import org.springframework.security.saml.util.SAMLUtil;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -72,6 +73,16 @@ public class WebSSOProfileHoKImplTest {
         request = createNiceMock(HttpServletRequest.class);
         response = createNiceMock(HttpServletResponse.class);
         output = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return false;
+            }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {
+
+            }
+
             public void write(int b) throws IOException {
             }
         };

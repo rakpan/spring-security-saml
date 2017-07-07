@@ -346,7 +346,7 @@ public class SingleLogoutProfileImpl extends AbstractProfileBase implements Sing
             if (message1 != null) {
                 logMessage[1] = message1.getMessage();
             }
-            log.warn("Received LogoutResponse has invalid status code", logMessage);
+            log.warn("Received LogoutResponse has invalid status code", logMessage[0]);
         }
     }
 }
