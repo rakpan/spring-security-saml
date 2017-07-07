@@ -53,61 +53,6 @@ public class SAMLContextProviderLB extends SAMLContextProviderImpl {
     }
 
     /**
-     * Wrapper for original request which overrides values of scheme, server name, server port and contextPath.
-     * Method isSecure returns value based on specified scheme.
-     */
-    private class LPRequestWrapper extends HttpServletRequestWrapper {
-
-        private LPRequestWrapper(HttpServletRequest request) {
-            super(request);
-        }
-
-        @Override
-        public String getContextPath() {
-            return contextPath;
-        }
-
-        @Override
-        public String getScheme() {
-            return scheme;
-        }
-
-        @Override
-        public String getServerName() {
-            return serverName;
-        }
-
-        @Override
-        public int getServerPort() {
-            return serverPort;
-        }
-
-        @Override
-        public String getRequestURI() {
-            StringBuilder sb = new StringBuilder(contextPath);
-            sb.append(getServletPath());
-            return sb.toString();
-        }
-
-        @Override
-        public StringBuffer getRequestURL() {
-            StringBuffer sb = new StringBuffer();
-            sb.append(scheme).append("://").append(serverName);
-            if (includeServerPortInRequestURL) sb.append(":").append(serverPort);
-            sb.append(contextPath);
-            sb.append(getServletPath());
-            if (getPathInfo() != null) sb.append(getPathInfo());
-            return sb;
-        }
-
-        @Override
-        public boolean isSecure() {
-            return "https".equalsIgnoreCase(scheme);
-        }
-
-    }
-
-    /**
      * Scheme of the LB server - either http or https
      *
      * @param scheme scheme
@@ -168,6 +113,59 @@ public class SAMLContextProviderLB extends SAMLContextProviderImpl {
         Assert.notNull(contextPath, "Context path must be set");
         if (StringUtils.hasLength(contextPath)) {
             Assert.isTrue(contextPath.startsWith("/"), "Context path must be set and start with a forward slash");
+        }
+
+    }
+
+    /**
+     * Wrapper for original request which overrides values of scheme, server name, server port and contextPath.
+     * Method isSecure returns value based on specified scheme.
+     */
+    private class LPRequestWrapper extends HttpServletRequestWrapper {
+
+        private LPRequestWrapper(HttpServletRequest request) {
+            super(request);
+        }
+
+        @Override
+        public String getContextPath() {
+            return contextPath;
+        }
+
+        @Override
+        public String getScheme() {
+            return scheme;
+        }
+
+        @Override
+        public String getServerName() {
+            return serverName;
+        }
+
+        @Override
+        public int getServerPort() {
+            return serverPort;
+        }
+
+        @Override
+        public String getRequestURI() {
+            return contextPath + getServletPath();
+        }
+
+        @Override
+        public StringBuffer getRequestURL() {
+            StringBuffer sb = new StringBuffer();
+            sb.append(scheme).append("://").append(serverName);
+            if (includeServerPortInRequestURL) sb.append(":").append(serverPort);
+            sb.append(contextPath);
+            sb.append(getServletPath());
+            if (getPathInfo() != null) sb.append(getPathInfo());
+            return sb;
+        }
+
+        @Override
+        public boolean isSecure() {
+            return "https".equalsIgnoreCase(scheme);
         }
 
     }

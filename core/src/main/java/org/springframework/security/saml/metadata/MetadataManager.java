@@ -905,29 +905,8 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
                 return null;
             }
 
-            String entityId = null;
-
-            for (String idp : idpName) {
-                ExtendedMetadata extendedMetadata = getExtendedMetadata(idp);
-                if (extendedMetadata.isLocal() && entityAlias.equals(extendedMetadata.getAlias())) {
-                    if (entityId != null && !entityId.equals(idp)) {
-                        throw new MetadataProviderException("Alias " + entityAlias + " is used both for entity " + entityId + " and " + idp);
-                    } else {
-                        entityId = idp;
-                    }
-                }
-            }
-
-            for (String sp : spName) {
-                ExtendedMetadata extendedMetadata = getExtendedMetadata(sp);
-                if (extendedMetadata.isLocal() && entityAlias.equals(extendedMetadata.getAlias())) {
-                    if (entityId != null && !entityId.equals(sp)) {
-                        throw new MetadataProviderException("Alias " + entityAlias + " is used both for entity " + entityId + " and " + sp);
-                    } else {
-                        entityId = sp;
-                    }
-                }
-            }
+            String entityId = extractEntityId(entityAlias, null, idpName);
+            entityId = extractEntityId(entityAlias, entityId, spName);
 
             return entityId;
 
@@ -937,6 +916,20 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
 
         }
 
+    }
+
+    private String extractEntityId(String entityAlias, String entityId, Set<String> names) throws MetadataProviderException {
+        for (String sp : names) {
+            ExtendedMetadata extendedMetadata = getExtendedMetadata(sp);
+            if (extendedMetadata.isLocal() && entityAlias.equals(extendedMetadata.getAlias())) {
+                if (entityId != null && !entityId.equals(sp)) {
+                    throw new MetadataProviderException("Alias " + entityAlias + " is used both for entity " + entityId + " and " + sp);
+                } else {
+                    entityId = sp;
+                }
+            }
+        }
+        return entityId;
     }
 
     /**

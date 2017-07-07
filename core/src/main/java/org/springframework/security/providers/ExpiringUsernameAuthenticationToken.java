@@ -61,11 +61,7 @@ public class ExpiringUsernameAuthenticationToken extends UsernamePasswordAuthent
      */
     @Override
     public boolean isAuthenticated() {
-        if (tokenExpiration != null && new Date().compareTo(tokenExpiration) >= 0) {
-            return false;
-        } else {
-            return super.isAuthenticated();
-        }
+        return !(tokenExpiration != null && new Date().compareTo(tokenExpiration) >= 0) && super.isAuthenticated();
     }
 
     /**
