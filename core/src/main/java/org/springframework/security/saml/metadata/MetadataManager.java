@@ -67,7 +67,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
     // Timer used to refresh the metadata upon changes
     private Timer timer;
     // Internal of metadata refresh checking in ms
-    private long refreshCheckInterval = 10000l;
+    private long refreshCheckInterval = 10000L;
     // Flag indicating whether metadata needs to be reloaded
     private boolean refreshRequired = true;
     // All providers which were added, not all may be active

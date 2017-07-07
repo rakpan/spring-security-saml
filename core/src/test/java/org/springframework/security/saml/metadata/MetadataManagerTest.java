@@ -27,15 +27,16 @@ import java.util.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Vladimir Schäfer
  */
 public class MetadataManagerTest {
 
-    ApplicationContext context;
-    MetadataManager manager;
+    private ApplicationContext context;
+    private MetadataManager manager;
 
     @Before
     public void initialize() throws Exception {
@@ -117,17 +118,17 @@ public class MetadataManagerTest {
         // Make sure the metadata is available
         metadataLoader = new Timer(true);
         entityVerifierExists = new EntityVerifier(Arrays.asList("nest1", "nest2", "nest3"), true);
-        entityVerifierToFail = new EntityVerifier(Arrays.asList("http://localhost:8080/opensso"), true);
-        metadataLoader.schedule(entityVerifierExists, 10l, 10l);
-        metadataLoader.schedule(entityVerifierToFail, 10l, 10l);
+        entityVerifierToFail = new EntityVerifier(Collections.singletonList("http://localhost:8080/opensso"), true);
+        metadataLoader.schedule(entityVerifierExists, 10L, 10L);
+        metadataLoader.schedule(entityVerifierToFail, 10L, 10L);
 
         synchronized (this) {
             wait(500);
         }
 
         // Make sure the open sso metadata loader failed
-        assertVerifiers(Arrays.asList(entityVerifierExists));
-        assertVerifiers(Arrays.asList(entityVerifierToFail));
+        assertVerifiers(Collections.singletonList(entityVerifierExists));
+        assertVerifiers(Collections.singletonList(entityVerifierToFail));
 
         // Remove an existing metadata
         manager.removeMetadataProvider(manager.getProviders().iterator().next());
@@ -137,7 +138,7 @@ public class MetadataManagerTest {
         }
 
         // Make sure the verifier failed
-        assertVerifiers(Arrays.asList(entityVerifierExists));
+        assertVerifiers(Collections.singletonList(entityVerifierExists));
         assertNotNull(entityVerifierToFail.getFailure());
 
         metadataLoader.cancel();
@@ -163,7 +164,7 @@ public class MetadataManagerTest {
         );
 
         for (EntityVerifier verifier : verifiers) {
-            metadataLoader.schedule(verifier, 7l, 7l);
+            metadataLoader.schedule(verifier, 7L, 7L);
         }
 
         // Explicitly refreshing providers to add concurrency
@@ -181,11 +182,11 @@ public class MetadataManagerTest {
                     }
                 }
             }
-        }, 100l, 10l);
+        }, 100L, 10L);
 
         Timer reloader = new Timer(true);
         MetadataReloader reloaderTask = new MetadataReloader();
-        reloader.schedule(reloaderTask, 50l, 50l);
+        reloader.schedule(reloaderTask, 50L, 50L);
 
         synchronized (this) {
             wait(4000);
@@ -246,6 +247,19 @@ public class MetadataManagerTest {
 
     }
 
+    private void assertVerifiers(List<EntityVerifier> verifiers) throws Exception {
+
+        for (EntityVerifier verifier : verifiers) {
+
+            assertTrue(verifier.getExecutions() > 0);
+            if (verifier.getFailure() != null) {
+                throw new RuntimeException(verifier.getFailure());
+            }
+
+        }
+
+    }
+
     private class MetadataReloader extends TimerTask {
 
         // State of the refresh flag during last execution
@@ -268,34 +282,17 @@ public class MetadataManagerTest {
             lastState = true;
         }
 
-        public int getReloaded() {
-            return reloaded;
-        }
-
-    }
-
-    private void assertVerifiers(List<EntityVerifier> verifiers) throws Exception {
-
-        for (EntityVerifier verifier : verifiers) {
-
-            assertTrue(verifier.getExecutions() > 0);
-            if (verifier.getFailure() != null) {
-                throw new RuntimeException(verifier.getFailure());
-            }
-
-        }
-
     }
 
     private class EntityVerifier extends TimerTask {
 
         private boolean present;
-        private List<String> entites;
+        private List<String> entities;
         private Throwable failure;
         private int executions = 0;
 
-        private EntityVerifier(List<String> entites, boolean present) {
-            this.entites = entites;
+        private EntityVerifier(List<String> entities, boolean present) {
+            this.entities = entities;
             this.present = present;
         }
 
@@ -306,7 +303,7 @@ public class MetadataManagerTest {
 
                 executions++;
 
-                for (String entity : entites) {
+                for (String entity : entities) {
 
                     if (present) {
                         assertNotNull(manager.getEntityDescriptor(entity));
@@ -318,9 +315,6 @@ public class MetadataManagerTest {
 
                 }
 
-            } catch (MetadataProviderException e) {
-                failure = e;
-                throw new RuntimeException("Timer has failed", e);
             } catch (Throwable e) {
                 failure = e;
                 throw new RuntimeException("Timer has failed", e);
@@ -328,11 +322,11 @@ public class MetadataManagerTest {
 
         }
 
-        public Throwable getFailure() {
+        Throwable getFailure() {
             return failure;
         }
 
-        public int getExecutions() {
+        int getExecutions() {
             return executions;
         }
 
