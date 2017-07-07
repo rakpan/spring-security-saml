@@ -16,7 +16,6 @@
 package org.springframework.security.saml.context;
 
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
-import org.springframework.security.saml.SAMLCredential;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

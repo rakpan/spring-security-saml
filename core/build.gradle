@@ -14,7 +14,7 @@ dependencies {
 		exclude group: "org.apache.xerces", module: "xml-apis"
 		exclude group: "org.apache.xerces", module: "serializer"
 	}
-	provided "javax.servlet:servlet-api:2.5"
+	provided "javax.servlet:javax.servlet-api:3.0.1"
 	runtime	"xml-apis:xml-apis:1.4.01"
 	testCompile "org.slf4j:slf4j-log4j12:1.6.3",
 		"org.easymock:easymock:2.4",

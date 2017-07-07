@@ -42,7 +42,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -54,26 +53,23 @@ import java.util.List;
  */
 public class SAMLLogoutProcessingFilter extends LogoutFilter {
 
-    protected SAMLProcessor processor;
-    protected SingleLogoutProfile logoutProfile;
-    protected SAMLLogger samlLogger;
-    protected SAMLContextProvider contextProvider;
-
-    /**
-     * Class logger.
-     */
-    protected static final Logger log = LoggerFactory.getLogger(SAMLLogoutProcessingFilter.class);
-
     /**
      * Default processing URL.
      */
     public static final String FILTER_URL = "/saml/SingleLogout";
-
+    /**
+     * Class logger.
+     */
+    protected static final Logger log = LoggerFactory.getLogger(SAMLLogoutProcessingFilter.class);
     /**
      * Logout handlers.
      */
     private final List<LogoutHandler> handlers;
-	private String filterProcessesUrl;
+    protected SAMLProcessor processor;
+    protected SingleLogoutProfile logoutProfile;
+    protected SAMLLogger samlLogger;
+    protected SAMLContextProvider contextProvider;
+    private String filterProcessesUrl;
 
     /**
      * Constructor defines URL to redirect to after successful logout and handlers.
@@ -285,6 +281,15 @@ public class SAMLLogoutProcessingFilter extends LogoutFilter {
     }
 
     /**
+     * Gets the URL used to determine if this Filter is invoked
+     *
+     * @return the URL used to determine if this Fitler is invoked
+     */
+    public String getFilterProcessesUrl() {
+        return filterProcessesUrl;
+    }
+
+    /**
      * Sets the URL used to determine if this Filter is invoked
      * @param filterProcessesUrl the URL used to determine if this Filter is invoked
      */
@@ -292,14 +297,6 @@ public class SAMLLogoutProcessingFilter extends LogoutFilter {
     public void setFilterProcessesUrl(String filterProcessesUrl) {
         this.filterProcessesUrl = filterProcessesUrl;
         super.setFilterProcessesUrl(filterProcessesUrl);
-    }
-
-    /**
-     * Gets the URL used to determine if this Filter is invoked
-     * @return the URL used to determine if this Fitler is invoked
-     */
-    public String getFilterProcessesUrl() {
-        return filterProcessesUrl;
     }
 
 }

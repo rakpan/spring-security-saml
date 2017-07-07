@@ -59,25 +59,17 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
 
     // Lock for the refresh mechanism
     private final ReentrantReadWriteLock refreshLock = new ReentrantReadWriteLock();
-
-    private String hostedSPName;
-
-    private String defaultIDP;
-
-    private ExtendedMetadata defaultExtendedMetadata;
-
-    // Timer used to refresh the metadata upon changes
-    private Timer timer;
-
-    // Internal of metadata refresh checking in ms
-    private long refreshCheckInterval = 10000l;
-
-    // Flag indicating whether metadata needs to be reloaded
-    private boolean refreshRequired = true;
-
     // Storage for cryptographic data used to verify metadata signatures
     protected KeyManager keyManager;
-
+    private String hostedSPName;
+    private String defaultIDP;
+    private ExtendedMetadata defaultExtendedMetadata;
+    // Timer used to refresh the metadata upon changes
+    private Timer timer;
+    // Internal of metadata refresh checking in ms
+    private long refreshCheckInterval = 10000l;
+    // Flag indicating whether metadata needs to be reloaded
+    private boolean refreshRequired = true;
     // All providers which were added, not all may be active
     private List<ExtendedMetadataDelegate> availableProviders;
 
@@ -110,10 +102,10 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
 
         super();
 
-        this.idpName = new HashSet<String>();
-        this.spName = new HashSet<String>();
+        this.idpName = new HashSet<>();
+        this.spName = new HashSet<>();
         this.defaultExtendedMetadata = new ExtendedMetadata();
-        availableProviders = new LinkedList<ExtendedMetadataDelegate>();
+        availableProviders = new LinkedList<>();
 
         setProviders(providers);
         getObservers().add(new MetadataProviderObserver());
@@ -170,7 +162,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
             // Workaround for Tomcat detection of terminated threads
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ignored) {
             }
 
             setRefreshRequired(false);
@@ -181,30 +173,6 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
             refreshLock.writeLock().unlock();
 
         }
-
-    }
-
-    @Override
-    public void setProviders(List<MetadataProvider> newProviders) throws MetadataProviderException {
-
-        try {
-
-            lock.writeLock().lock();
-
-            availableProviders.clear();
-            if (newProviders != null) {
-                for (MetadataProvider provider : newProviders) {
-                    addMetadataProvider(provider);
-                }
-            }
-
-        } finally {
-
-            lock.writeLock().unlock();
-
-        }
-
-        setRefreshRequired(true);
 
     }
 
@@ -222,12 +190,12 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
             lock.writeLock().lock();
 
             // Remove existing providers, they'll get repopulated
-            super.setProviders(Collections.<MetadataProvider>emptyList());
+            super.setProviders(Collections.emptyList());
 
             // Reinitialize the sets
-            idpName = new HashSet<String>();
-            spName = new HashSet<String>();
-            aliasSet = new HashSet<String>();
+            idpName = new HashSet<>();
+            spName = new HashSet<>();
+            aliasSet = new HashSet<>();
 
             for (ExtendedMetadataDelegate provider : availableProviders) {
 
@@ -365,10 +333,34 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
 
         try {
             lock.readLock().lock();
-            return new ArrayList<MetadataProvider>(super.getProviders());
+            return new ArrayList<>(super.getProviders());
         } finally {
             lock.readLock().unlock();
         }
+
+    }
+
+    @Override
+    public void setProviders(List<MetadataProvider> newProviders) throws MetadataProviderException {
+
+        try {
+
+            lock.writeLock().lock();
+
+            availableProviders.clear();
+            if (newProviders != null) {
+                for (MetadataProvider provider : newProviders) {
+                    addMetadataProvider(provider);
+                }
+            }
+
+        } finally {
+
+            lock.writeLock().unlock();
+
+        }
+
+        setRefreshRequired(true);
 
     }
 
@@ -382,7 +374,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
 
         try {
             lock.readLock().lock();
-            return new ArrayList<ExtendedMetadataDelegate>(availableProviders);
+            return new ArrayList<>(availableProviders);
         } finally {
             lock.readLock().unlock();
         }
@@ -614,7 +606,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
         }
 
         // Resolve allowed certificates to build the anchors
-        List<X509Certificate> certificates = new LinkedList<X509Certificate>();
+        List<X509Certificate> certificates = new LinkedList<>();
         for (String key : trustedKeys) {
             log.debug("Adding PKIX trust anchor {} for metadata verification of provider {}", key, provider);
             X509Certificate certificate = keyManager.getCertificate(key);
@@ -625,7 +617,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
             }
         }
 
-        List<PKIXValidationInformation> info = new LinkedList<PKIXValidationInformation>();
+        List<PKIXValidationInformation> info = new LinkedList<>();
         info.add(new BasicPKIXValidationInformation(certificates, null, 4));
         return new StaticPKIXValidationInformationResolver(info, trustedNames);
 
@@ -640,7 +632,7 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
      */
     protected List<String> parseProvider(MetadataProvider provider) throws MetadataProviderException {
 
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
 
         XMLObject object = provider.getMetadata();
         if (object instanceof EntityDescriptor) {
@@ -1016,6 +1008,16 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
         this.refreshCheckInterval = refreshCheckInterval;
     }
 
+    @Autowired
+    public void setKeyManager(KeyManager keyManager) {
+        this.keyManager = keyManager;
+    }
+
+    @Autowired(required = false)
+    public void setTLSConfigurer(TLSProtocolConfigurer configurer) {
+        // Only explicit dependency
+    }
+
     /**
      * Task used to refresh the metadata when required.
      */
@@ -1061,16 +1063,6 @@ public class MetadataManager extends ChainingMetadataProvider implements Extende
             setRefreshRequired(true);
         }
 
-    }
-
-    @Autowired
-    public void setKeyManager(KeyManager keyManager) {
-        this.keyManager = keyManager;
-    }
-
-    @Autowired(required = false)
-    public void setTLSConfigurer(TLSProtocolConfigurer configurer) {
-        // Only explicit dependency
     }
 
 }

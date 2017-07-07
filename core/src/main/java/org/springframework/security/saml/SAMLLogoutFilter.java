@@ -16,7 +16,6 @@
 package org.springframework.security.saml;
 
 import org.opensaml.common.SAMLException;
-import org.opensaml.common.SAMLRuntimeException;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 
 /**
@@ -53,26 +51,23 @@ import java.io.IOException;
  */
 public class SAMLLogoutFilter extends LogoutFilter {
 
-    protected SingleLogoutProfile profile;
-    protected SAMLLogger samlLogger;
-    protected SAMLContextProvider contextProvider;
-    private String filterProcessesUrl;
-
+    /**
+     * URL this filter processes
+     */
+    public static final String FILTER_URL = "/saml/logout";
     /**
      * Name of parameter of HttpRequest indicating whether this call should perform only local logout.
      * In case the value is true no global logout will be invoked.
      */
     protected static final String LOGOUT_PARAMETER = "local";
-
+    protected SingleLogoutProfile profile;
+    protected SAMLLogger samlLogger;
+    protected SAMLContextProvider contextProvider;
     /**
      * Handlers to be invoked during logout.
      */
     protected LogoutHandler[] globalHandlers;
-
-    /**
-     * URL this filter processes
-     */
-    public static final String FILTER_URL = "/saml/logout";
+    private String filterProcessesUrl;
 
     /**
      * Default constructor.
@@ -234,6 +229,15 @@ public class SAMLLogoutFilter extends LogoutFilter {
     }
 
     /**
+     * Gets the URL used to determine if this Filter is invoked
+     *
+     * @return the URL used to determine if this Fitler is invoked
+     */
+    public String getFilterProcessesUrl() {
+        return filterProcessesUrl;
+    }
+
+    /**
      * Sets the URL used to determine if this Filter is invoked
      * @param filterProcessesUrl the URL used to determine if this Filter is invoked
      */
@@ -241,13 +245,5 @@ public class SAMLLogoutFilter extends LogoutFilter {
     public void setFilterProcessesUrl(String filterProcessesUrl) {
         this.filterProcessesUrl = filterProcessesUrl;
         super.setFilterProcessesUrl(filterProcessesUrl);
-    }
-
-    /**
-     * Gets the URL used to determine if this Filter is invoked
-     * @return the URL used to determine if this Fitler is invoked
-     */
-    public String getFilterProcessesUrl() {
-        return filterProcessesUrl;
     }
 }

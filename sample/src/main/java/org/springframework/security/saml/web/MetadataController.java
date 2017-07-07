@@ -48,14 +48,8 @@ import static org.springframework.util.StringUtils.hasLength;
 public class MetadataController {
 
     private final Logger log = LoggerFactory.getLogger(MetadataController.class);
-
-    public static enum AllowedSSOBindings {
-        SSO_POST, SSO_PAOS, SSO_ARTIFACT, HOKSSO_POST, HOKSSO_ARTIFACT
-    }
-
     @Autowired
     MetadataManager metadataManager;
-
     @Autowired
     KeyManager keyManager;
 
@@ -76,8 +70,7 @@ public class MetadataController {
     @RequestMapping(value = "/login")
     public ModelAndView adminLogin() {
 
-        ModelAndView model = new ModelAndView(new InternalResourceView("/WEB-INF/security/adminLogin.jsp", true));
-        return model;
+        return new ModelAndView(new InternalResourceView("/WEB-INF/security/adminLogin.jsp", true));
 
     }
 
@@ -147,8 +140,8 @@ public class MetadataController {
         generator.setRequestSigned(metadata.isRequestSigned());
         generator.setWantAssertionSigned(metadata.isWantAssertionSigned());
 
-        Collection<String> bindingsSSO = new LinkedList<String>();
-        Collection<String> bindingsHoKSSO = new LinkedList<String>();
+        Collection<String> bindingsSSO = new LinkedList<>();
+        Collection<String> bindingsHoKSSO = new LinkedList<>();
         String defaultBinding = metadata.getSsoDefaultBinding();
         int assertionConsumerIndex = 0;
 
@@ -316,7 +309,7 @@ public class MetadataController {
     }
 
     protected Map<String, String> getAvailablePrivateKeys() throws KeyStoreException {
-        Map<String, String> availableKeys = new HashMap<String, String>();
+        Map<String, String> availableKeys = new HashMap<>();
         Set<String> aliases = keyManager.getAvailableCredentials();
         for (String key : aliases) {
             try {
@@ -399,6 +392,10 @@ public class MetadataController {
     @ModelAttribute(value = "tab")
     public String getTabName() {
         return "metadata";
+    }
+
+    public static enum AllowedSSOBindings {
+        SSO_POST, SSO_PAOS, SSO_ARTIFACT, HOKSSO_POST, HOKSSO_ARTIFACT
     }
 
 }

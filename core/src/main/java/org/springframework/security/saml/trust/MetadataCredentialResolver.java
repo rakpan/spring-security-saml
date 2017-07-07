@@ -27,7 +27,6 @@ import org.springframework.security.saml.metadata.MetadataManager;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * Class customizes resolving from metadata by first using values present in the ExtenedeMetadata of an entity.
@@ -89,7 +88,7 @@ public class MetadataCredentialResolver extends org.opensaml.security.MetadataCr
 
         try {
 
-            Collection<Credential> credentials = new ArrayList<Credential>();
+            Collection<Credential> credentials = new ArrayList<>();
 
             if (useExtendedMetadata) {
                 ExtendedMetadata extendedMetadata = manager.getExtendedMetadata(entityID);

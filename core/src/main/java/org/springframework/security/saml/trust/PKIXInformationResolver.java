@@ -19,6 +19,7 @@ package org.springframework.security.saml.trust;
 import org.opensaml.saml2.metadata.provider.MetadataProvider;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
 import org.opensaml.saml2.metadata.provider.ObservableMetadataProvider;
+import org.opensaml.security.MetadataCredentialResolver;
 import org.opensaml.security.MetadataCriteria;
 import org.opensaml.xml.security.CriteriaSet;
 import org.opensaml.xml.security.SecurityException;
@@ -31,7 +32,6 @@ import org.opensaml.xml.security.x509.PKIXValidationInformation;
 import org.opensaml.xml.security.x509.PKIXValidationInformationResolver;
 import org.opensaml.xml.security.x509.X509Credential;
 import org.opensaml.xml.util.DatatypeHelper;
-import org.opensaml.security.MetadataCredentialResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.saml.key.KeyManager;
@@ -101,7 +101,7 @@ public class PKIXInformationResolver implements PKIXValidationInformationResolve
         this.metadataResolver = metadataResolver;
         this.metadata = metadataProvider;
         this.keyManager = keyManager;
-        this.cache = new HashMap<MetadataCacheKey, SoftReference<Collection<PKIXValidationInformation>>>();
+        this.cache = new HashMap<>();
         this.rwlock = new ReentrantReadWriteLock();
         this.metadata.getObservers().add(new MetadataProviderObserver());
 
@@ -159,13 +159,13 @@ public class PKIXInformationResolver implements PKIXValidationInformationResolve
      * @return PKIX information
      */
     protected Collection<PKIXValidationInformation> populateCredentials(CriteriaSet criteriaSet) throws SecurityException {
-        Collection<X509Certificate> anchors = new ArrayList<X509Certificate>();
-        Collection<X509CRL> crls = new ArrayList<X509CRL>();
+        Collection<X509Certificate> anchors = new ArrayList<>();
+        Collection<X509CRL> crls = new ArrayList<>();
         populateMetadataAnchors(criteriaSet, anchors, crls);
         populateTrustedKeysAnchors(criteriaSet, anchors, crls);
         populateCRLs(criteriaSet, anchors, crls);
         PKIXValidationInformation info = new BasicPKIXValidationInformation(anchors, crls, getPKIXDepth());
-        return new ArrayList<PKIXValidationInformation>(Arrays.asList(info));
+        return new ArrayList<>(Collections.singletonList(info));
     }
 
     /**
@@ -314,11 +314,39 @@ public class PKIXInformationResolver implements PKIXValidationInformationResolve
         writeLock.lock();
         log.trace("Write lock over cache acquired");
         try {
-            cache.put(cacheKey, new SoftReference<Collection<PKIXValidationInformation>>(credentials));
+            cache.put(cacheKey, new SoftReference<>(credentials));
             log.debug("Added new credential collection to cache with key: {}", cacheKey);
         } finally {
             writeLock.unlock();
             log.trace("Write lock over cache released");
+        }
+    }
+
+    public Set<String> resolveTrustedNames(CriteriaSet criteriaSet) throws org.opensaml.xml.security.SecurityException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("Method isn't supported");
+    }
+
+    public boolean supportsTrustedNameResolution() {
+        return false;
+    }
+
+    public Iterable<PKIXValidationInformation> resolve(CriteriaSet criteria) throws SecurityException {
+        return resolveFromSource(criteria);
+    }
+
+    /**
+     * Returns first found PKIX information satisfying the condition.
+     *
+     * @param criteria criteria
+     * @return first instance
+     * @throws SecurityException error
+     */
+    public PKIXValidationInformation resolveSingle(CriteriaSet criteria) throws SecurityException {
+        Iterator<PKIXValidationInformation> iterator = resolveFromSource(criteria).iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            return null;
         }
     }
 
@@ -439,34 +467,6 @@ public class PKIXInformationResolver implements PKIXValidationInformationResolve
                 writeLock.unlock();
                 log.trace("Write lock over cache released");
             }
-        }
-    }
-
-    public Set<String> resolveTrustedNames(CriteriaSet criteriaSet) throws org.opensaml.xml.security.SecurityException, UnsupportedOperationException {
-        throw new UnsupportedOperationException("Method isn't supported");
-    }
-
-    public boolean supportsTrustedNameResolution() {
-        return false;
-    }
-
-    public Iterable<PKIXValidationInformation> resolve(CriteriaSet criteria) throws SecurityException {
-        return resolveFromSource(criteria);
-    }
-
-    /**
-     * Returns first found PKIX information satisfying the condition.
-     *
-     * @param criteria criteria
-     * @return first instance
-     * @throws SecurityException error
-     */
-    public PKIXValidationInformation resolveSingle(CriteriaSet criteria) throws SecurityException {
-        Iterator<PKIXValidationInformation> iterator = resolveFromSource(criteria).iterator();
-        if (iterator.hasNext()) {
-            return iterator.next();
-        } else {
-            return null;
         }
     }
 

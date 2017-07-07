@@ -42,17 +42,14 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SAMLProcessingFilter extends AbstractAuthenticationProcessingFilter {
 
-    protected final static Logger logger = LoggerFactory.getLogger(SAMLProcessingFilter.class);
-
-    protected SAMLProcessor processor;
-    protected SAMLContextProvider contextProvider;
-
-    private String filterProcessesUrl;
-
     /**
      * URL for Web SSO profile responses or unsolicited requests
      */
     public static final String FILTER_URL = "/saml/SSO";
+    protected final static Logger logger = LoggerFactory.getLogger(SAMLProcessingFilter.class);
+    protected SAMLProcessor processor;
+    protected SAMLContextProvider contextProvider;
+    private String filterProcessesUrl;
 
     public SAMLProcessingFilter() {
         this(FILTER_URL);
@@ -86,7 +83,7 @@ public class SAMLProcessingFilter extends AbstractAuthenticationProcessingFilter
             SAMLAuthenticationToken token = new SAMLAuthenticationToken(context);
             return getAuthenticationManager().authenticate(token);
 
-        } catch (SAMLException e) {
+        } catch (SAMLException | org.opensaml.xml.security.SecurityException e) {
             logger.debug("Incoming SAML message is invalid", e);
             throw new AuthenticationServiceException("Incoming SAML message is invalid", e);
         } catch (MetadataProviderException e) {
@@ -95,9 +92,6 @@ public class SAMLProcessingFilter extends AbstractAuthenticationProcessingFilter
         } catch (MessageDecodingException e) {
             logger.debug("Error decoding incoming SAML message", e);
             throw new AuthenticationServiceException("Error decoding incoming SAML message", e);
-        } catch (org.opensaml.xml.security.SecurityException e) {
-            logger.debug("Incoming SAML message is invalid", e);
-            throw new AuthenticationServiceException("Incoming SAML message is invalid", e);
         }
 
     }
@@ -168,6 +162,15 @@ public class SAMLProcessingFilter extends AbstractAuthenticationProcessingFilter
     }
 
     /**
+     * Gets the URL used to determine if this Filter is invoked
+     *
+     * @return the URL used to determine if this Fitler is invoked
+     */
+    public String getFilterProcessesUrl() {
+        return filterProcessesUrl;
+    }
+
+    /**
      * Sets the URL used to determine if this Filter is invoked
      * @param filterProcessesUrl the URL used to determine if this Filter is invoked
      */
@@ -175,13 +178,5 @@ public class SAMLProcessingFilter extends AbstractAuthenticationProcessingFilter
     public void setFilterProcessesUrl(String filterProcessesUrl) {
         this.filterProcessesUrl = filterProcessesUrl;
         super.setFilterProcessesUrl(filterProcessesUrl);
-    }
-
-    /**
-     * Gets the URL used to determine if this Filter is invoked
-     * @return the URL used to determine if this Fitler is invoked
-     */
-    public String getFilterProcessesUrl() {
-        return filterProcessesUrl;
     }
 }

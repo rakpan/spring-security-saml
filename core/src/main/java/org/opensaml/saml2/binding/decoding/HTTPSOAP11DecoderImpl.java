@@ -18,7 +18,6 @@ package org.opensaml.saml2.binding.decoding;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.ws.message.decoder.MessageDecodingException;
 import org.opensaml.ws.transport.InTransport;
-import org.opensaml.ws.transport.http.HttpClientInTransport;
 import org.opensaml.ws.transport.http.LocationAwareInTransport;
 import org.opensaml.xml.parse.ParserPool;
 

@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Key manager doesn't provide access to any keys and can be used to skip inclusion of keystore files in the

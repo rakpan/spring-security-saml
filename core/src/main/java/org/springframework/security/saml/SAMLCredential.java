@@ -100,11 +100,11 @@ public class SAMLCredential implements Serializable {
      * @param additionalData          custom data created by profile customization
      */
     public SAMLCredential(NameID nameID, Assertion authenticationAssertion, String remoteEntityID, String relayState, List<Attribute> attributes, String localEntityID, Serializable additionalData) {
-        this.nameID = new SAMLObject<NameID>(nameID);
-        this.authenticationAssertion = new SAMLObject<Assertion>(authenticationAssertion);
+        this.nameID = new SAMLObject<>(nameID);
+        this.authenticationAssertion = new SAMLObject<>(authenticationAssertion);
         this.remoteEntityID = remoteEntityID;
         this.relayState = relayState;
-        this.attributes = new SAMLCollection<Attribute>(attributes);
+        this.attributes = new SAMLCollection<>(attributes);
         this.localEntityID = localEntityID;
         this.additionalData = additionalData;
     }

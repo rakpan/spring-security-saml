@@ -39,24 +39,21 @@ import java.util.Set;
 public class HttpSessionStorage implements SAMLMessageStorage {
 
     /**
+     * Session key for storage of the hashtable.
+     */
+    private static final String SAML_STORAGE_KEY = "_springSamlStorageKey";
+    /**
      * Class logger.
      */
     protected final Logger log = LoggerFactory.getLogger(getClass());
-
     /**
      * Session the storage operates on.
      */
     private final HttpSession session;
-
     /**
      * Internal storage for messages, corresponding to the object in session.
      */
     private Hashtable<String, SAMLObject<XMLObject>> internalMessages;
-
-    /**
-     * Session key for storage of the hashtable.
-     */
-    private static final String SAML_STORAGE_KEY = "_springSamlStorageKey";
 
     /**
      * Creates the storage object. The session is manipulated only once caller tries to store
@@ -92,7 +89,7 @@ public class HttpSessionStorage implements SAMLMessageStorage {
     public void storeMessage(String messageID, XMLObject message) {
         log.debug("Storing message {} to session {}", messageID, session.getId());
         Hashtable<String, SAMLObject<XMLObject>> messages = getMessages();
-        messages.put(messageID, new SAMLObject<XMLObject>(message));
+        messages.put(messageID, new SAMLObject<>(message));
         updateSession(messages);
     }
 
@@ -158,7 +155,7 @@ public class HttpSessionStorage implements SAMLMessageStorage {
             synchronized (session) {
                 messages = (Hashtable<String, SAMLObject<XMLObject>>) session.getAttribute(SAML_STORAGE_KEY);
                 if (messages == null) {
-                    messages = new Hashtable<String, SAMLObject<XMLObject>>();
+                    messages = new Hashtable<>();
                     updateSession(messages);
                 }
             }

@@ -16,8 +16,8 @@ configure(allprojects) { project ->
 	group = "org.springframework.security.extensions"
 
 	ext.slf4jVersion = "1.6.3"
-	ext.springVersion = "3.1.2.RELEASE"
-	ext.springSecurityVersion = "3.1.2.RELEASE"
+	ext.springVersion = "4.3.9.RELEASE"
+	ext.springSecurityVersion = "4.2.3.RELEASE"
 	ext.gradleScriptDir = "${rootProject.projectDir}/gradle"
 
 	apply plugin: "propdeps"
@@ -25,12 +25,12 @@ configure(allprojects) { project ->
 	apply from: "${gradleScriptDir}/ide.gradle"
 
 	compileJava {
-		sourceCompatibility=1.6
-		targetCompatibility=1.6
+		sourceCompatibility=1.8
+		targetCompatibility=1.8
 	}
 	compileTestJava {
-		sourceCompatibility=1.6
-		targetCompatibility=1.6
+		sourceCompatibility=1.8
+		targetCompatibility=1.8
 	}
 
 	test {

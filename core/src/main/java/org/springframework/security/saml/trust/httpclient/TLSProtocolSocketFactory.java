@@ -1,26 +1,18 @@
 package org.springframework.security.saml.trust.httpclient;
 
 import org.apache.commons.httpclient.params.HttpConnectionParams;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.opensaml.xml.security.CriteriaSet;
 import org.opensaml.xml.security.trust.TrustEngine;
 import org.opensaml.xml.security.x509.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.security.saml.key.KeyManager;
-import org.springframework.security.saml.metadata.MetadataManager;
 import org.springframework.security.saml.trust.CertPathPKIXTrustEvaluator;
 import org.springframework.security.saml.trust.X509KeyManager;
 import org.springframework.security.saml.trust.X509TrustManager;
 import org.springframework.security.saml.util.SAMLUtil;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.HostnameVerifier;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -135,13 +127,13 @@ public class TLSProtocolSocketFactory implements SecureProtocolSocketFactory {
         }
 
         // Resolve allowed certificates to build the anchors
-        List<X509Certificate> certificates = new ArrayList<X509Certificate>(trustedKeys.size());
+        List<X509Certificate> certificates = new ArrayList<>(trustedKeys.size());
         for (String key : trustedKeys) {
             log.debug("Adding PKIX trust anchor {} for SSL/TLS verification {}", key);
             certificates.add(keyManager.getCertificate(key));
         }
 
-        List<PKIXValidationInformation> info = new LinkedList<PKIXValidationInformation>();
+        List<PKIXValidationInformation> info = new LinkedList<>();
         info.add(new BasicPKIXValidationInformation(certificates, null, 4));
         return new StaticPKIXValidationInformationResolver(info, null);
 

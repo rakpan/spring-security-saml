@@ -17,7 +17,10 @@ package org.springframework.security.saml.metadata;
 import org.opensaml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.RoleDescriptor;
-import org.opensaml.saml2.metadata.provider.*;
+import org.opensaml.saml2.metadata.provider.MetadataFilter;
+import org.opensaml.saml2.metadata.provider.MetadataProvider;
+import org.opensaml.saml2.metadata.provider.MetadataProviderException;
+import org.opensaml.saml2.metadata.provider.ObservableMetadataProvider;
 import org.opensaml.xml.XMLObject;
 import org.springframework.util.Assert;
 
@@ -34,14 +37,13 @@ import java.util.List;
 public abstract class AbstractMetadataDelegate implements ObservableMetadataProvider {
 
     /**
-     * Wrapped entity the calls are delegated to.
-     */
-    private MetadataProvider delegate;
-
-    /**
      * Observers, loaded from the provider.
      */
     List<Observer> observers;
+    /**
+     * Wrapped entity the calls are delegated to.
+     */
+    private MetadataProvider delegate;
 
     /**
      * Default constructor assigning the delegate. In case the provider implements observable interface the observation
@@ -55,7 +57,7 @@ public abstract class AbstractMetadataDelegate implements ObservableMetadataProv
         if (delegate instanceof ObservableMetadataProvider) {
             observers = ((ObservableMetadataProvider) delegate).getObservers();
         } else {
-            observers = new LinkedList<Observer>();
+            observers = new LinkedList<>();
         }
     }
 

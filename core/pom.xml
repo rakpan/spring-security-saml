@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.security.extensions</groupId>
   <artifactId>spring-security-saml2-core</artifactId>
-  <version>1.0.1.BUILD-SNAPSHOT</version>
+    <version>1.0.2.BUILD-SNAPSHOT</version>
   <name>Spring Security SAML v2 library</name>
   <description>Spring Security SAML v2 library</description>
   <url>https://github.com/SpringSource/spring-security-saml</url>
@@ -19,13 +20,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <mailingLists>
-    <mailingList>
-      <name>Spring Security SAML Forum</name>
-      <post>http://forum.springsource.org/forumdisplay.php?86-SAML</post>
-      <archive>http://forum.springsource.org/forumdisplay.php?86-SAML</archive>
-    </mailingList>
-  </mailingLists>
   <developers>
     <developer>
       <id>vschafer</id>
@@ -48,15 +42,22 @@
       <name>Wade Dorrell</name>
     </contributor>
   </contributors>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.springsource.org/browse/SES</url>
-  </issueManagement>
+    <mailingLists>
+        <mailingList>
+            <name>Spring Security SAML Forum</name>
+            <post>http://forum.springsource.org/forumdisplay.php?86-SAML</post>
+            <archive>http://forum.springsource.org/forumdisplay.php?86-SAML</archive>
+        </mailingList>
+    </mailingLists>
   <scm>
     <connection>scm:git:git://github.com/SpringSource/spring-security-saml</connection>
     <developerConnection>scm:git:git://github.com/SpringSource/spring-security-saml</developerConnection>
     <url>https://github.com/SpringSource/spring-security-saml</url>
   </scm>
+    <issueManagement>
+        <system>jira</system>
+        <url>http://jira.springsource.org/browse/SES</url>
+    </issueManagement>
   <dependencies>
     <dependency>
       <groupId>org.opensaml</groupId>
@@ -69,17 +70,17 @@
           <groupId>org.apache.xerces</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jcl-over-slf4j</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>serializer</artifactId>
           <groupId>org.apache.xerces</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>log4j-over-slf4j</artifactId>
-          <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <groupId>org.slf4j</groupId>
         </exclusion>
+          <exclusion>
+              <artifactId>log4j-over-slf4j</artifactId>
+              <groupId>org.slf4j</groupId>
+          </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -91,19 +92,19 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>3.1.2.RELEASE</version>
+        <version>4.2.3.RELEASE</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>3.1.2.RELEASE</version>
+        <version>4.2.3.RELEASE</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>3.1.2.RELEASE</version>
+        <version>4.2.3.RELEASE</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -118,8 +119,8 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.0.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -155,7 +156,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>3.1.2.RELEASE</version>
+        <version>4.3.9.RELEASE</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

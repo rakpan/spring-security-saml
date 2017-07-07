@@ -52,25 +52,23 @@ import java.util.*;
  */
 public class MetadataGenerator {
 
-    private String id;
-    private String entityId;
-    private String entityBaseURL;
-
-    private boolean requestSigned = true;
-    private boolean wantAssertionSigned = true;
-
     /**
-     * Index of the assertion consumer endpoint marked as default.
+     * Default set of NameIDs included in metadata.
      */
-    private int assertionConsumerIndex = 0;
-
+    public static final Collection<String> defaultNameID = Arrays.asList(
+            NameIDType.EMAIL,
+            NameIDType.TRANSIENT,
+            NameIDType.PERSISTENT,
+            NameIDType.UNSPECIFIED,
+            NameIDType.X509_SUBJECT
+    );
     /**
-     * Extended metadata with details on metadata generation.
+     * Class logger.
      */
-    private ExtendedMetadata extendedMetadata;
-
+    protected final static Logger log = LoggerFactory.getLogger(MetadataGenerator.class);
     // List of case-insensitive alias terms
-    private static TreeMap<String, String> aliases = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+    private static TreeMap<String, String> aliases = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
     static {
         aliases.put(SAMLConstants.SAML2_POST_BINDING_URI, SAMLConstants.SAML2_POST_BINDING_URI);
         aliases.put("post", SAMLConstants.SAML2_POST_BINDING_URI);
@@ -97,49 +95,11 @@ public class MetadataGenerator {
         aliases.put("x509_subject", NameIDType.X509_SUBJECT);
     }
 
-    /**
-     * Bindings for single sign-on
-     */
-    private Collection<String> bindingsSSO = Arrays.asList("post", "artifact");
-
-    /**
-     * Bindings for single sign-on holder of key
-     */
-    private Collection<String> bindingsHoKSSO = Arrays.asList();
-
-    /**
-     * Bindings for single logout
-     */
-    private Collection<String> bindingsSLO = Arrays.asList("post", "redirect");
-
-    /**
-     * Flag indicates whether to include extension with discovery endpoints in metadata.
-     */
-    private boolean includeDiscoveryExtension;
-
-    /**
-     * NameIDs to be included in generated metadata.
-     */
-    private Collection<String> nameID = null;
-
-    /**
-     * Default set of NameIDs included in metadata.
-     */
-    public static final Collection<String> defaultNameID = Arrays.asList(
-            NameIDType.EMAIL,
-            NameIDType.TRANSIENT,
-            NameIDType.PERSISTENT,
-            NameIDType.UNSPECIFIED,
-            NameIDType.X509_SUBJECT
-    );
-
     protected XMLObjectBuilderFactory builderFactory;
-
     /**
      * Source of certificates.
      */
     protected KeyManager keyManager;
-
     /**
      * Filters for loading of paths.
      */
@@ -148,11 +108,39 @@ public class MetadataGenerator {
     protected SAMLLogoutProcessingFilter samlLogoutProcessingFilter;
     protected SAMLEntryPoint samlEntryPoint;
     protected SAMLDiscovery samlDiscovery;
-
+    private String id;
+    private String entityId;
+    private String entityBaseURL;
+    private boolean requestSigned = true;
+    private boolean wantAssertionSigned = true;
     /**
-     * Class logger.
+     * Index of the assertion consumer endpoint marked as default.
      */
-    protected final static Logger log = LoggerFactory.getLogger(MetadataGenerator.class);
+    private int assertionConsumerIndex = 0;
+    /**
+     * Extended metadata with details on metadata generation.
+     */
+    private ExtendedMetadata extendedMetadata;
+    /**
+     * Bindings for single sign-on
+     */
+    private Collection<String> bindingsSSO = Arrays.asList("post", "artifact");
+    /**
+     * Bindings for single sign-on holder of key
+     */
+    private Collection<String> bindingsHoKSSO = Arrays.asList();
+    /**
+     * Bindings for single logout
+     */
+    private Collection<String> bindingsSLO = Arrays.asList("post", "redirect");
+    /**
+     * Flag indicates whether to include extension with discovery endpoints in metadata.
+     */
+    private boolean includeDiscoveryExtension;
+    /**
+     * NameIDs to be included in generated metadata.
+     */
+    private Collection<String> nameID = null;
 
     /**
      * Default constructor.
@@ -354,7 +342,7 @@ public class MetadataGenerator {
      * @return result with resolved aliases
      */
     protected Collection<String> mapAliases(Collection<String> values) {
-        LinkedHashSet<String> result = new LinkedHashSet<String>();
+        LinkedHashSet<String> result = new LinkedHashSet<>();
         for (String value : values) {
             String alias = aliases.get(value);
             if (alias != null) {
@@ -398,7 +386,7 @@ public class MetadataGenerator {
 
         // Resolve alases
         includedNameID = mapAliases(includedNameID);
-        Collection<NameIDFormat> formats = new LinkedList<NameIDFormat>();
+        Collection<NameIDFormat> formats = new LinkedList<>();
         SAMLObjectBuilder<NameIDFormat> builder = (SAMLObjectBuilder<NameIDFormat>) builderFactory.getBuilder(NameIDFormat.DEFAULT_ELEMENT_NAME);
 
         // Populate nameIDs
@@ -524,7 +512,7 @@ public class MetadataGenerator {
             // Add parameters
             URLBuilder returnUrlBuilder = new URLBuilder(resultString);
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                returnUrlBuilder.getQueryParams().add(new Pair<String, String>(entry.getKey(), entry.getValue()));
+                returnUrlBuilder.getQueryParams().add(new Pair<>(entry.getKey(), entry.getValue()));
             }
             return returnUrlBuilder.buildURL();
 
@@ -631,20 +619,20 @@ public class MetadataGenerator {
         this.keyManager = keyManager;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getId() {
         return id;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEntityId() {
         return entityId;
+    }
+
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public Collection<String> getBindingsSSO() {
@@ -782,7 +770,7 @@ public class MetadataGenerator {
         if (extendedMetadata != null && extendedMetadata.getIdpDiscoveryResponseURL() != null && extendedMetadata.getIdpDiscoveryResponseURL().length() > 0) {
             return extendedMetadata.getIdpDiscoveryResponseURL();
         } else {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put(SAMLEntryPoint.DISCOVERY_RESPONSE_PARAMETER, "true");
             return getServerURL(entityBaseURL, entityAlias, getSAMLEntryPointPath(), params);
         }

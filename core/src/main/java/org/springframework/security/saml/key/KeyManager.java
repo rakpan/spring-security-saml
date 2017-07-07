@@ -34,7 +34,7 @@ public interface KeyManager extends CredentialResolver {
      * @param keyName name of the key to use, in case of null default key is used
      * @return credential
      */
-    public Credential getCredential(String keyName);
+    Credential getCredential(String keyName);
 
     /**
      * Returns Credential object used to sign the messages issued by this entity.
@@ -42,7 +42,7 @@ public interface KeyManager extends CredentialResolver {
      *
      * @return credential
      */
-    public Credential getDefaultCredential();
+    Credential getDefaultCredential();
 
     /**
      * Method provides name of the credential which should be used by default when no other is specified. It
@@ -50,14 +50,14 @@ public interface KeyManager extends CredentialResolver {
      *
      * @return default credential name
      */
-    public String getDefaultCredentialName();
+    String getDefaultCredentialName();
 
     /**
      * Method provides list of all credentials available in the storage.
      *
      * @return available credentials
      */
-    public Set<String> getAvailableCredentials();
+    Set<String> getAvailableCredentials();
 
     /**
      * Returns certificate with the given alias from the keystore.
@@ -65,7 +65,7 @@ public interface KeyManager extends CredentialResolver {
      * @param alias alias of certificate to find
      * @return certificate with the given alias or null if not found
      */
-    public X509Certificate getCertificate(String alias);
+    X509Certificate getCertificate(String alias);
 
 
 }

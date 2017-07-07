@@ -16,8 +16,6 @@
 
 package org.opensaml.liberty.paos.impl;
 
-import javax.xml.namespace.QName;
-
 import org.opensaml.common.impl.AbstractSAMLObjectUnmarshaller;
 import org.opensaml.liberty.paos.Request;
 import org.opensaml.xml.XMLObject;
@@ -25,6 +23,8 @@ import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.schema.XSBooleanValue;
 import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Attr;
+
+import javax.xml.namespace.QName;
 
 /**
  * Unmarshaller for instances of {@link Request}.

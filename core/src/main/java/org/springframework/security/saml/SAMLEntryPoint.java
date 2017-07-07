@@ -15,7 +15,6 @@
 package org.springframework.security.saml;
 
 import org.opensaml.common.SAMLException;
-import org.opensaml.common.SAMLRuntimeException;
 import org.opensaml.saml2.metadata.AssertionConsumerService;
 import org.opensaml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.saml2.metadata.provider.MetadataProviderException;
@@ -63,8 +62,20 @@ import java.util.List;
  */
 public class SAMLEntryPoint extends GenericFilterBean implements AuthenticationEntryPoint {
 
+    /**
+     * Default name of path suffix which will invoke this filter.
+     */
+    public static final String FILTER_URL = "/saml/login";
+    /**
+     * Name of parameter of HttpRequest telling entry point that the login should use specified idp.
+     */
+    public static final String IDP_PARAMETER = "idp";
+    /**
+     * Parameter is used to indicate response from IDP discovery service. When present IDP discovery is not invoked
+     * again.
+     */
+    public static final String DISCOVERY_RESPONSE_PARAMETER = "disco";
     protected final static Logger logger = LoggerFactory.getLogger(SAMLEntryPoint.class);
-
     protected WebSSOProfileOptions defaultOptions;
     protected WebSSOProfile webSSOprofile;
     protected WebSSOProfile webSSOprofileECP;
@@ -73,27 +84,10 @@ public class SAMLEntryPoint extends GenericFilterBean implements AuthenticationE
     protected SAMLLogger samlLogger;
     protected SAMLContextProvider contextProvider;
     protected SAMLDiscovery samlDiscovery;
-
     /**
      * Url this filter should get activated on.
      */
     protected String filterProcessesUrl = FILTER_URL;
-
-    /**
-     * Default name of path suffix which will invoke this filter.
-     */
-    public static final String FILTER_URL = "/saml/login";
-
-    /**
-     * Name of parameter of HttpRequest telling entry point that the login should use specified idp.
-     */
-    public static final String IDP_PARAMETER = "idp";
-
-    /**
-     * Parameter is used to indicate response from IDP discovery service. When present IDP discovery is not invoked
-     * again.
-     */
-    public static final String DISCOVERY_RESPONSE_PARAMETER = "disco";
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -245,8 +239,8 @@ public class SAMLEntryPoint extends GenericFilterBean implements AuthenticationE
 
             URLBuilder urlBuilder = new URLBuilder(discoveryURL);
             List<Pair<String, String>> queryParams = urlBuilder.getQueryParams();
-            queryParams.add(new Pair<String, String>(SAMLDiscovery.ENTITY_ID_PARAM, context.getLocalEntityId()));
-            queryParams.add(new Pair<String, String>(SAMLDiscovery.RETURN_ID_PARAM, IDP_PARAMETER));
+            queryParams.add(new Pair<>(SAMLDiscovery.ENTITY_ID_PARAM, context.getLocalEntityId()));
+            boolean add = queryParams.add(new Pair<String, String>(SAMLDiscovery.RETURN_ID_PARAM, IDP_PARAMETER));
             discoveryURL = urlBuilder.buildURL();
 
             logger.debug("Using discovery URL from extended metadata");

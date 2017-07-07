@@ -14,7 +14,6 @@
  */
 package org.springframework.security.saml.userdetails;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 

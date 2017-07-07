@@ -35,8 +35,8 @@ import org.springframework.security.saml.util.SAMLUtil;
 import org.springframework.util.Assert;
 
 import javax.xml.namespace.QName;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Processor is capable of parsing SAML message from HttpServletRequest and populate the SAMLMessageContext
@@ -59,7 +59,7 @@ public class SAMLProcessorImpl implements SAMLProcessor {
      * @param binding binding
      */
     public SAMLProcessorImpl(SAMLBinding binding) {
-        this.bindings = Arrays.asList(binding);
+        this.bindings = Collections.singletonList(binding);
     }
 
     /**

@@ -39,31 +39,6 @@ public class UntrustedCertificateException extends CertificateException {
         this.x509Certificates = x509Certificates;
     }
 
-    /**
-     * @return certificates which could not be verified as trusted
-     */
-    public X509Certificate[] getX509Certificates() {
-        return x509Certificates;
-    }
-
-    @Override
-    public String getMessage() {
-        StringBuilder sb = new StringBuilder(150);
-        sb.append(super.getMessage());
-        if (x509Certificates != null && x509Certificates.length > 0) {
-            sb.append("\n\nFollow certificates (in PEM format) presented by the peer. Content between being/end certificate (including) can be stored in a file and imported using keytool, e.g. 'keytool -importcert -file cert.cer -alias certAlias -keystore keystore.jks'). Make sure the presented certificates are issued by your trusted CA before adding them to the keystore.\n\n");
-            for (X509Certificate cert : x509Certificates) {
-                sb.append("Subject: ").append(cert.getSubjectDN()).append("\n");
-                sb.append("Serial number: ").append(cert.getSerialNumber()).append("\n");
-                appendThumbPrint(cert, sb);
-                sb.append("\n");
-                appendCertificate(cert, sb);
-                sb.append("\n");
-            }
-        }
-        return sb.toString();
-    }
-
     private static void appendThumbPrint(X509Certificate x509Certificate, StringBuilder sb) {
         sb.append("Thumbprint SHA-1: ");
         appendThumbPrint(x509Certificate, "SHA-1", sb);
@@ -81,10 +56,8 @@ public class UntrustedCertificateException extends CertificateException {
             byte[] digest = md.digest();
             char[] encode = Hex.encode(digest);
             appendHexSpace(encode, sb);
-        } catch (NoSuchAlgorithmException e) {
-            sb.append ("Error calculating thumbprint: " + e.getMessage());
-        } catch (CertificateEncodingException e) {
-            sb.append("Error calculating thumbprint: " + e.getMessage());
+        } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
+            sb.append("Error calculating thumbprint: ").append(e.getMessage());
         }
     }
 
@@ -116,6 +89,31 @@ public class UntrustedCertificateException extends CertificateException {
             sb.append("Cannot encode: ").append(e.getMessage());
         }
         sb.append("-----END CERTIFICATE-----\n");
+    }
+
+    /**
+     * @return certificates which could not be verified as trusted
+     */
+    public X509Certificate[] getX509Certificates() {
+        return x509Certificates;
+    }
+
+    @Override
+    public String getMessage() {
+        StringBuilder sb = new StringBuilder(150);
+        sb.append(super.getMessage());
+        if (x509Certificates != null && x509Certificates.length > 0) {
+            sb.append("\n\nFollow certificates (in PEM format) presented by the peer. Content between being/end certificate (including) can be stored in a file and imported using keytool, e.g. 'keytool -importcert -file cert.cer -alias certAlias -keystore keystore.jks'). Make sure the presented certificates are issued by your trusted CA before adding them to the keystore.\n\n");
+            for (X509Certificate cert : x509Certificates) {
+                sb.append("Subject: ").append(cert.getSubjectDN()).append("\n");
+                sb.append("Serial number: ").append(cert.getSerialNumber()).append("\n");
+                appendThumbPrint(cert, sb);
+                sb.append("\n");
+                appendCertificate(cert, sb);
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
 }

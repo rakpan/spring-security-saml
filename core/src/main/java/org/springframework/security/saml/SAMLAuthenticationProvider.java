@@ -50,12 +50,12 @@ import java.util.*;
 public class SAMLAuthenticationProvider implements AuthenticationProvider, InitializingBean {
 
     private final static Logger log = LoggerFactory.getLogger(SAMLAuthenticationProvider.class);
-    private boolean forcePrincipalAsString = true;
-    private boolean excludeCredential = false;
     protected WebSSOProfileConsumer consumer;
     protected WebSSOProfileConsumer hokConsumer;
     protected SAMLLogger samlLogger;
     protected SAMLUserDetailsService userDetails;
+    private boolean forcePrincipalAsString = true;
+    private boolean excludeCredential = false;
 
     /**
      * Attempts to perform authentication of an Authentication object. The authentication must be of type
@@ -90,19 +90,11 @@ public class SAMLAuthenticationProvider implements AuthenticationProvider, Initi
             } else {
                 throw new SAMLException("Unsupported profile encountered in the context " + context.getCommunicationProfileId());
             }
-        } catch (SAMLRuntimeException e) {
+        } catch (SAMLRuntimeException | SAMLException e) {
             log.debug("Error validating SAML message", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message", e);
-        } catch (SAMLException e) {
-            log.debug("Error validating SAML message", e);
-            samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
-            throw new AuthenticationServiceException("Error validating SAML message", e);
-        } catch (ValidationException e) {
-            log.debug("Error validating signature", e);
-            samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
-            throw new AuthenticationServiceException("Error validating SAML message signature", e);
-        } catch (org.opensaml.xml.security.SecurityException e) {
+        } catch (ValidationException | org.opensaml.xml.security.SecurityException e) {
             log.debug("Error validating signature", e);
             samlLogger.log(SAMLConstants.AUTH_N_RESPONSE, SAMLConstants.FAILURE, context, e);
             throw new AuthenticationServiceException("Error validating SAML message signature", e);
@@ -180,7 +172,7 @@ public class SAMLAuthenticationProvider implements AuthenticationProvider, Initi
      */
     protected Collection<? extends GrantedAuthority> getEntitlements(SAMLCredential credential, Object userDetail) {
         if (userDetail instanceof UserDetails) {
-            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+            List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.addAll(((UserDetails) userDetail).getAuthorities());
             return authorities;
         } else {
@@ -219,16 +211,6 @@ public class SAMLAuthenticationProvider implements AuthenticationProvider, Initi
     }
 
     /**
-     * SAMLAuthenticationToken is the only supported token.
-     *
-     * @param aClass class to check for support
-     * @return true if class is of type SAMLAuthenticationToken
-     */
-    public boolean supports(Class aClass) {
-        return SAMLAuthenticationToken.class.isAssignableFrom(aClass);
-    }
-
-    /**
      * The user details can be optionally set and is automatically called while user SAML assertion
      * is validated.
      *
@@ -237,6 +219,16 @@ public class SAMLAuthenticationProvider implements AuthenticationProvider, Initi
     @Autowired(required = false)
     public void setUserDetails(SAMLUserDetailsService userDetails) {
         this.userDetails = userDetails;
+    }
+
+    /**
+     * SAMLAuthenticationToken is the only supported token.
+     *
+     * @param aClass class to check for support
+     * @return true if class is of type SAMLAuthenticationToken
+     */
+    public boolean supports(Class aClass) {
+        return SAMLAuthenticationToken.class.isAssignableFrom(aClass);
     }
 
     /**

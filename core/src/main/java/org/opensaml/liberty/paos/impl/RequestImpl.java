@@ -16,12 +16,12 @@
 
 package org.opensaml.liberty.paos.impl;
 
-import java.util.List;
-
 import org.opensaml.common.impl.AbstractSAMLObject;
 import org.opensaml.liberty.paos.Request;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.schema.XSBooleanValue;
+
+import java.util.List;
 
 public class RequestImpl extends AbstractSAMLObject implements Request {
     
@@ -58,24 +58,28 @@ public class RequestImpl extends AbstractSAMLObject implements Request {
     }
 
     /** {@inheritDoc} */
-    public String getResponseConsumerURL() {
-        return responseConsumerURL;
-    }
-
-    /** {@inheritDoc} */
-    public String getService() {
-        return service;
-    }
-
-    /** {@inheritDoc} */
     public void setMessageID(String newMessageID) {
         messageID = prepareForAssignment(messageID, newMessageID);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getResponseConsumerURL() {
+        return responseConsumerURL;
     }
 
     /** {@inheritDoc} */
     public void setResponseConsumerURL(String newResponseConsumerURL) {
         responseConsumerURL = prepareForAssignment(responseConsumerURL,
                 newResponseConsumerURL);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getService() {
+        return service;
     }
 
     /** {@inheritDoc} */

@@ -266,7 +266,7 @@ public class SAMLUtil {
      */
     public static List<String> getBase64EncodeCertificates(KeyInfo keyInfo) {
 
-        List<String> certList = new LinkedList<String>();
+        List<String> certList = new LinkedList<>();
 
         if (keyInfo == null) {
             return certList;
@@ -291,7 +291,7 @@ public class SAMLUtil {
      */
     public static List<String> getBase64EncodedCertificates(X509Data x509Data) {
 
-        List<String> certList = new LinkedList<String>();
+        List<String> certList = new LinkedList<>();
 
         if (x509Data == null) {
             return certList;

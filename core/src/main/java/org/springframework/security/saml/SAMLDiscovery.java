@@ -51,83 +51,69 @@ import java.util.List;
  */
 public class SAMLDiscovery extends GenericFilterBean {
 
-    protected final static Logger logger = LoggerFactory.getLogger(SAMLDiscovery.class);
-
     /**
      * Used to store return URL in the forwarded request object.
      */
     public static final String RETURN_URL = "idpDiscoReturnURL";
-
     /**
      * Used to store return parameter in the forwarded request object.
      */
     public static final String RETURN_PARAM = "idpDiscoReturnParam";
-
     /**
      * Unique identifier of the party performing the request. Part of IDP Disco specification.
      */
     public static final String ENTITY_ID_PARAM = "entityID";
-
     /**
      * URL used by the discovery service to send the response. Value is verified against metadata of the requesting
      * entity. URL can contain additional query part, but mustn't include the same attribute as specified in returnIdParam.
      * Part of IDP Disco specification.
      */
     public static final String RETURN_URL_PARAM = "return";
-
     /**
      * Request parameter specifying which response attribute to use for conveying the determined IDP name.
      * Uses "entityID" when empty. Part of IDP Disco specification.
      */
     public static final String RETURN_ID_PARAM = "returnIDParam";
-
     /**
      * Policy to use in order to determine IDP. Only the default IDP_DISCO_PROTOCOL_SINGLE is supported and is
      * also used when policy request attribute is unspecified. Part of IDP Disco specification.
      */
     public static final String POLICY_PARAM = "policy";
-
     /**
      * Request parameter indicating whether discovery service can interact with the user agent. Allowed
      * values are "true" or "false" Set to "false" when unspecified. Part of IDP Disco specification.
      */
     public static final String PASSIVE_PARAM = "isPassive";
-
+    /**
+     * Default name of path suffix which will invoke this filter.
+     */
+    public static final String FILTER_URL = "/saml/discovery";
+    /**
+     * Default profile of the discovery service.
+     */
+    public static final String IDP_DISCO_PROTOCOL_SINGLE = "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol:single";
+    protected final static Logger logger = LoggerFactory.getLogger(SAMLDiscovery.class);
     /**
      * In case this property is set to not null value the user will be redirected to this URL for selection
      * of IDP to use for login. In case it is null user will be redirected to the default IDP.
      */
     protected String idpSelectionPath;
-
     /**
      * Metadata manager used to look up entity IDs and discovery URLs.
      */
     protected MetadataManager metadata;
-
     /**
      * Context provider.
      */
     protected SAMLContextProvider contextProvider;
-
     /**
      * Entry point dependency for loading of correct URL.
      */
     protected SAMLEntryPoint samlEntryPoint;
-
     /**
      * Url this filter should get activated on.
      */
     protected String filterProcessesUrl = FILTER_URL;
-
-    /**
-     * Default name of path suffix which will invoke this filter.
-     */
-    public static final String FILTER_URL = "/saml/discovery";
-
-    /**
-     * Default profile of the discovery service.
-     */
-    public static final String IDP_DISCO_PROTOCOL_SINGLE = "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol:single";
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -254,7 +240,7 @@ public class SAMLDiscovery extends GenericFilterBean {
         if (entityID != null) {
             URLBuilder urlBuilder = new URLBuilder(responseURL);
             List<Pair<String, String>> queryParams = urlBuilder.getQueryParams();
-            queryParams.add(new Pair<String, String>(returnParam, entityID));
+            queryParams.add(new Pair<>(returnParam, entityID));
             finalResponseURL = urlBuilder.buildURL();
         }
 
@@ -350,11 +336,7 @@ public class SAMLDiscovery extends GenericFilterBean {
         URLBuilder foundURL = new URLBuilder(returnURL);
         URLBuilder defaultURL = new URLBuilder(getDefaultReturnURL(messageContext));
 
-        if (!defaultURL.getHost().equals(foundURL.getHost())) {
-            return false;
-        }
-
-        return true;
+        return defaultURL.getHost().equals(foundURL.getHost());
 
     }
 
